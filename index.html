@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090914">
+  <meta name="description" content="Veilbreak: Eclipse — an original anime-inspired 2.5D tag-assist fighting game prototype.">
+  <title>VEILBREAK: ECLIPSE</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/style.css">
+  <script src="./src/game.js" defer></script>
+</head>
+<body>
+  <main id="app">
+    <canvas id="gameCanvas" aria-label="Veilbreak fighting arena"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <section id="titleScreen" class="screen title-screen">
+      <div class="brand-block">
+        <div class="eyebrow"><span class="eyebrow-line"></span> ORIGINAL 2.5D COMBAT PROJECT <span class="eyebrow-line"></span></div>
+        <h1>VEILBREAK<span>:</span><br><em>ECLIPSE</em></h1>
+        <p class="tagline">Every hit writes the next move.</p>
+        <div class="title-rule"><span></span><i>✦</i><span></span></div>
+      </div>
+      <nav class="main-menu" aria-label="Main menu">
+        <button id="localButton" class="menu-button primary"><span class="button-index">01</span><span><b>LOCAL VERSUS</b><small>Two players · same screen</small></span><span class="button-arrow">↗</span></button>
+        <button id="trainingButton" class="menu-button"><span class="button-index">02</span><span><b>TRAINING / CPU</b><small>Practice cancels, combos and assists</small></span><span class="button-arrow">↗</span></button>
+        <button id="onlineButton" class="menu-button"><span class="button-index">03</span><span><b>ONLINE DUEL</b><small>Peer-to-peer room · internet required</small></span><span class="button-arrow">↗</span></button>
+      </nav>
+      <div class="title-foot"><span>BUILD 0.2 · KAGURA CHARACTER INTEGRATION</span><span>ALL CHARACTERS ARE ADULTS · 18+</span></div>
+    </section>
+
+    <section id="onlineScreen" class="screen dialog-screen hidden">
+      <div class="dialog-card">
+        <button class="close-button" data-close="titleScreen" aria-label="Back">×</button>
+        <div class="eyebrow">NETWORK DUEL</div>
+        <h2>CONNECT <em>FIGHTERS</em></h2>
+        <p class="muted">Create a room and share its code, or enter your opponent’s code. Both players need this page open.</p>
+        <div class="online-actions">
+          <button id="createRoomButton" class="action-button primary">CREATE ROOM</button>
+          <div class="join-row"><input id="roomCodeInput" type="text" spellcheck="false" autocomplete="off" placeholder="Opponent room code" aria-label="Opponent room code"><button id="joinRoomButton" class="action-button">JOIN</button></div>
+        </div>
+        <div id="roomInfo" class="room-info hidden">
+          <label>YOUR ROOM CODE</label>
+          <div class="room-code-row"><code id="roomCode">Preparing…</code><button id="copyRoomButton" class="small-button">COPY</button></div>
+        </div>
+        <div id="networkStatus" class="network-status" role="status">Not connected.</div>
+        <p class="fine-print">Online play uses WebRTC through a public signaling broker and a public STUN server. Network availability, NAT settings, and browser support can affect connections.</p>
+      </div>
+    </section>
+
+    <section id="selectScreen" class="screen select-screen hidden">
+      <div class="select-header">
+        <div><div class="eyebrow">ASSEMBLE YOUR DUO</div><h2>CHOOSE YOUR <em>FIGHTER</em></h2></div>
+        <button id="selectBackButton" class="small-button">← BACK</button>
+      </div>
+      <div class="roster-strip" id="rosterStrip" aria-label="Available fighters"></div>
+      <div class="select-columns">
+        <article class="select-panel p1-panel">
+          <div class="panel-top"><span class="player-marker p1-marker">P1</span><div><h3>FIRST STRIKE</h3><p id="p1RoleNote">Player One</p></div><span class="panel-symbol">◈</span></div>
+          <label for="p1Fighter">MAIN FIGHTER</label><select id="p1Fighter"></select>
+          <label for="p1Partner">PARTNER ASSIST</label><select id="p1Partner"></select>
+          <div class="partner-hint" id="p1Hint"></div>
+          <div class="selection-summary" id="p1Summary"></div>
+        </article>
+        <div class="versus-mark" aria-hidden="true">VS</div>
+        <article class="select-panel p2-panel">
+          <div class="panel-top"><span class="player-marker p2-marker">P2</span><div><h3>COUNTER STRIKE</h3><p id="p2RoleNote">Player Two</p></div><span class="panel-symbol">◇</span></div>
+          <label for="p2Fighter">MAIN FIGHTER</label><select id="p2Fighter"></select>
+          <label for="p2Partner">PARTNER ASSIST</label><select id="p2Partner"></select>
+          <div class="partner-hint" id="p2Hint"></div>
+          <div class="selection-summary" id="p2Summary"></div>
+        </article>
+      </div>
+      <div class="select-footer"><div id="readyStatus" class="ready-status">Pick a fighter and a partner.</div><button id="startMatchButton" class="action-button primary big">ENTER THE ARENA <span>↗</span></button></div>
+      <p class="fine-print">Kagura uses the supplied animated character sheets. Other fighters are still procedural placeholders; production art, separated armor layers, voice acting, balance, and netcode remain in development.</p>
+    </section>
+
+    <div id="matchTopbar" class="match-topbar hidden">
+      <div class="match-title"><span class="live-dot"></span> VEILBREAK <small>· ECLIPSE</small></div>
+      <div class="match-controls"><span id="matchModeLabel">VERSUS</span><button id="pauseButton" class="small-button">Ⅱ PAUSE</button><button id="matchMenuButton" class="small-button">MENU</button></div>
+    </div>
+    <section id="pauseScreen" class="screen dialog-screen hidden">
+      <div class="dialog-card pause-card"><div class="eyebrow">MATCH PAUSED</div><h2>TAKE A <em>BREATHER</em></h2><p class="muted">Your duel is paused locally. Online matches pause only on this screen; return to the fight to continue syncing.</p><button id="resumeButton" class="action-button primary">RESUME FIGHT</button><button id="pauseMenuButton" class="action-button">RETURN TO MENU</button></div>
+    </section>
+    <section id="endScreen" class="screen dialog-screen hidden">
+      <div class="dialog-card pause-card"><div class="eyebrow">DUEL COMPLETE</div><h2 id="resultTitle">PLAYER 1 WINS</h2><p id="resultSubtitle" class="muted">A duel decided by timing, pressure and armor management.</p><button id="rematchButton" class="action-button primary">REMATCH</button><button id="resultSelectButton" class="action-button">CHANGE FIGHTERS</button><button id="resultMenuButton" class="action-button">RETURN TO TITLE</button></div>
+    </section>
+
+    <div id="touchP1" class="touch-controls touch-left" aria-label="Player one touch controls">
+      <div class="touch-movement"><button data-player="1" data-control="left">◀</button><button data-player="1" data-control="jump">▲</button><button data-player="1" data-control="crouch">▼</button><button data-player="1" data-control="right">▶</button></div>
+      <div class="touch-attacks"><button data-player="1" data-control="light"><span>L</span><small>LIGHT</small></button><button data-player="1" data-control="heavy"><span>H</span><small>HEAVY</small></button><button data-player="1" data-control="special"><span>S</span><small>SPECIAL</small></button><button data-player="1" data-control="assist"><span>A</span><small>ASSIST</small></button><button data-player="1" data-control="dash"><span>»</span><small>DASH</small></button><button data-player="1" data-control="guard"><span>G</span><small>GUARD</small></button></div>
+    </div>
+    <div id="touchP2" class="touch-controls touch-right" aria-label="Player two touch controls">
+      <div class="touch-movement"><button data-player="2" data-control="left">◀</button><button data-player="2" data-control="jump">▲</button><button data-player="2" data-control="crouch">▼</button><button data-player="2" data-control="right">▶</button></div>
+      <div class="touch-attacks"><button data-player="2" data-control="light"><span>L</span><small>LIGHT</small></button><button data-player="2" data-control="heavy"><span>H</span><small>HEAVY</small></button><button data-player="2" data-control="special"><span>S</span><small>SPECIAL</small></button><button data-player="2" data-control="assist"><span>A</span><small>ASSIST</small></button><button data-player="2" data-control="dash"><span>»</span><small>DASH</small></button><button data-player="2" data-control="guard"><span>G</span><small>GUARD</small></button></div>
+    </div>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </main>
+</body>
+</html>
